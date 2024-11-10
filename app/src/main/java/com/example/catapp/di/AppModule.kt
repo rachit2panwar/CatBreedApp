@@ -4,6 +4,7 @@ import android.content.Context
 import com.chuckerteam.chucker.api.ChuckerInterceptor
 import com.example.catapp.common.Constants
 import com.example.catapp.data.network.CatApiService
+import com.squareup.picasso.Picasso
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -18,6 +19,10 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 class AppModule {
+
+    @Provides
+    @Singleton
+    fun providePicasso(): Picasso = Picasso.get()
 
     @Provides
     @Singleton

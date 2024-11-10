@@ -7,13 +7,13 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.catapp.R
 import com.example.catapp.data.models.BreedDetailModel
 import com.example.catapp.databinding.FragmentCatDetailsBinding
 import com.example.catapp.presentation.viewmodel.CatViewModel
+import com.squareup.picasso.Picasso
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 
 @AndroidEntryPoint
@@ -21,6 +21,9 @@ class CatDetailsFragment : Fragment() {
 
     private lateinit var binding: FragmentCatDetailsBinding
     private val viewModel: CatViewModel by activityViewModels()
+
+    @Inject
+    internal lateinit var picasso: Picasso
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -67,10 +70,8 @@ class CatDetailsFragment : Fragment() {
 
     private fun loadImage(imgUrl: String?) {
         imgUrl?.let {
-            Glide.with(this)
+            picasso
                 .load(it)
-                .placeholder(R.drawable.image_placeholder)
-                .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
                 .into(binding.ivCat)
         }
     }

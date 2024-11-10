@@ -12,5 +12,7 @@ data class CatBreedDataModel(
     @SerializedName("origin")
     val origin: String? = "",
     @SerializedName("life_span")
-    val lifeSpan: String? = ""
+    val lifeSpan: String? = "",
+    @SerializedName("reference_image_id")
+    val referenceImageId: String? = ""
 )

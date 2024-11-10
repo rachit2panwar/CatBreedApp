@@ -13,15 +13,17 @@ import com.example.catapp.R
 import com.example.catapp.data.models.CatBreedDataModel
 import com.example.catapp.databinding.FragmentCatBreedBinding
 import com.example.catapp.presentation.adapter.CatAdapter
-import com.example.catapp.presentation.adapter.listener.CatItemClickListener
 import com.example.catapp.presentation.viewmodel.CatViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
-class CatBreedFragment : Fragment(), CatItemClickListener {
+class CatBreedFragment : Fragment() {
     private lateinit var binding: FragmentCatBreedBinding
     private val viewModel: CatViewModel by activityViewModels()
-    private lateinit var catAdapter: CatAdapter
+
+    @Inject
+    internal lateinit var catAdapter: CatAdapter
 
 
     override fun onCreateView(
@@ -34,9 +36,20 @@ class CatBreedFragment : Fragment(), CatItemClickListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setupToolbar()
         setupViewModel()
         setupRecyclerView()
         getCatBreedData()
+    }
+
+    private fun setupToolbar() {
+        // Setting up the toolbar
+        binding.toolbar.title = "Cat Breeds"
+
+        // Handle back button click
+        binding.toolbar.setNavigationOnClickListener {
+            requireActivity().onBackPressedDispatcher.onBackPressed()
+        }
     }
 
     private fun getCatBreedData() {
@@ -57,7 +70,6 @@ class CatBreedFragment : Fragment(), CatItemClickListener {
     }
 
     private fun setupRecyclerView() {
-        catAdapter = CatAdapter(this)
         binding.rvCat.apply {
             adapter = catAdapter
             layoutManager = LinearLayoutManager(
@@ -65,15 +77,14 @@ class CatBreedFragment : Fragment(), CatItemClickListener {
                 RecyclerView.VERTICAL, false
             )
         }
+        catAdapter.setOnClick { model ->
+            viewModel.setCatBread(model)
+            startFragment()
+        }
     }
 
     private fun submitList(catBreedList: List<CatBreedDataModel>){
         catAdapter.submitList(catBreedList)
-    }
-
-    override fun onCatItemClick(catDetails: CatBreedDataModel) {
-        viewModel.setCatBread(catDetails)
-        startFragment()
     }
 
     private fun startFragment() {
