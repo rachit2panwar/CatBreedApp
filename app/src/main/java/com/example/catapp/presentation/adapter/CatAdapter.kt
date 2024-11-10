@@ -6,12 +6,9 @@ import androidx.recyclerview.widget.ListAdapter
 import com.example.catapp.data.models.CatBreedDataModel
 import com.example.catapp.databinding.ItemCatBinding
 import com.example.catapp.presentation.adapter.viewholder.CatAdapterViewHolder
-import com.squareup.picasso.Picasso
 import javax.inject.Inject
 
-class CatAdapter @Inject constructor(
-    private val picasso: Picasso): ListAdapter<CatBreedDataModel, CatAdapterViewHolder>(CatDataDiffCallback()) {
-
+class CatAdapter @Inject constructor() : ListAdapter<CatBreedDataModel, CatAdapterViewHolder>(CatDataDiffCallback()) {
 
     private var onClick: ((CatBreedDataModel) -> Unit)? = null
 
@@ -21,15 +18,16 @@ class CatAdapter @Inject constructor(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CatAdapterViewHolder {
         val binding = ItemCatBinding.inflate(
-                LayoutInflater.from(parent.context),
+            LayoutInflater.from(parent.context),
             parent,
-        false
+            false
         )
-        return CatAdapterViewHolder(binding, onClick, picasso)
+        return CatAdapterViewHolder(binding).apply {
+            setItemClickListener(onClick)
+        }
     }
 
     override fun onBindViewHolder(holder: CatAdapterViewHolder, position: Int) {
-        val catDetails = getItem(position)
-        holder.bind(catDetails)
+        holder.bind(getItem(position))
     }
 }

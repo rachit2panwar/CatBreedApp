@@ -7,13 +7,16 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.load.resource.bitmap.CenterCrop
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.catapp.R
-import com.example.catapp.data.models.BreedDetailModel
+import com.example.catapp.data.models.CatBreedDataModel
 import com.example.catapp.databinding.FragmentCatDetailsBinding
 import com.example.catapp.presentation.viewmodel.CatViewModel
-import com.squareup.picasso.Picasso
+import com.example.catapp.utils.ImageUrlUtils
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 
 
 @AndroidEntryPoint
@@ -22,8 +25,6 @@ class CatDetailsFragment : Fragment() {
     private lateinit var binding: FragmentCatDetailsBinding
     private val viewModel: CatViewModel by activityViewModels()
 
-    @Inject
-    internal lateinit var picasso: Picasso
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -46,8 +47,8 @@ class CatDetailsFragment : Fragment() {
     }
 
     private fun setupDataObserver() {
-        viewModel.breedDetailsData.observe(viewLifecycleOwner) { breedList ->
-            breedList.getOrNull(0)?.let { setupUI(it) }
+        viewModel.breedDetailsData.observe(viewLifecycleOwner) { breedItem ->
+            setupUI(breedItem)
         }
         viewModel.errorMessage.observe(viewLifecycleOwner) {
             Toast.makeText(this@CatDetailsFragment.context, it, Toast.LENGTH_SHORT).show()
@@ -55,8 +56,9 @@ class CatDetailsFragment : Fragment() {
         }
     }
 
-    private fun setupUI(breedDetailModel: BreedDetailModel) {
-        loadImage(breedDetailModel.url)
+    private fun setupUI(breedDetailModel: CatBreedDataModel) {
+        loadImage(breedDetailModel.referenceImageId?.let { ImageUrlUtils.buildImageUrl(it) })
+
         viewModel.sharedCatBreed.value?.let {
             binding.apply {
                 tvBreedName.text = resources.getString(R.string.breed_name, it.name)
@@ -69,15 +71,22 @@ class CatDetailsFragment : Fragment() {
     }
 
     private fun loadImage(imgUrl: String?) {
+        val cornerRadius = context?.resources?.getDimensionPixelSize(R.dimen.image_corner_radius) ?: 0
+
         imgUrl?.let {
-            picasso
+            Glide.with(binding.ivCat.context)
                 .load(it)
+                .placeholder(R.drawable.image_placeholder) // Show a placeholder while loading
+                .error(R.drawable.image_placeholder) // Show this image if the URL fails
+                .transform(CenterCrop(), RoundedCorners(cornerRadius))
+                .diskCacheStrategy(DiskCacheStrategy.ALL) // Cache the image for better performance
                 .into(binding.ivCat)
         }
     }
 
+
     override fun onDestroy() {
-        viewModel.clearBreedDetails()
+        viewModel.breedDetailsData.removeObservers(this)
         super.onDestroy()
     }
 }

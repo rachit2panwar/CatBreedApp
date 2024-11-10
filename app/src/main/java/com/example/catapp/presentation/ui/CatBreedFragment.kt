@@ -43,10 +43,8 @@ class CatBreedFragment : Fragment() {
     }
 
     private fun setupToolbar() {
-        // Setting up the toolbar
-        binding.toolbar.title = "Cat Breeds"
+        binding.toolbar.title = getString(R.string.cat_breeds_title)
 
-        // Handle back button click
         binding.toolbar.setNavigationOnClickListener {
             requireActivity().onBackPressedDispatcher.onBackPressed()
         }

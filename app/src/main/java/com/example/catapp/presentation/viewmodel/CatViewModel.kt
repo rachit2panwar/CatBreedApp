@@ -22,8 +22,8 @@ class CatViewModel @Inject constructor(
     private val _catBreedData = MutableLiveData<List<CatBreedDataModel>>()
     val catBreedData : LiveData<List<CatBreedDataModel>> = _catBreedData
 
-    private val _breedDetailsData = MutableLiveData<List<BreedDetailModel>>()
-    val breedDetailsData : LiveData<List<BreedDetailModel>> = _breedDetailsData
+    private val _breedDetailsData = MutableLiveData<CatBreedDataModel>()
+    val breedDetailsData : LiveData<CatBreedDataModel> = _breedDetailsData
 
     private val _sharedCatBreed = MutableLiveData<CatBreedDataModel>()
     val sharedCatBreed : LiveData<CatBreedDataModel> = _sharedCatBreed
@@ -56,9 +56,5 @@ class CatViewModel @Inject constructor(
 
     fun setCatBread(breedDetailModel: CatBreedDataModel) {
         _sharedCatBreed.postValue(breedDetailModel)
-    }
-
-    fun clearBreedDetails() {
-        _breedDetailsData.postValue(emptyList())
     }
 }

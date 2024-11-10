@@ -6,4 +6,5 @@
     <string name="description"><b>Description:</b> %1$s</string>
     <string name="iv_content_desc">Cat Image</string>
     <string name="cat_breeds">Cat Breeds</string>
+    <string name="cat_breeds_title">Cat Breeds</string>
 </resources>
