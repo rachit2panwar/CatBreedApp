@@ -1,13 +1,15 @@
 package com.example.catapp.di
 
 import android.content.Context
-import com.chuckerteam.chucker.api.ChuckerInterceptor
+import com.example.catapp.BuildConfig
 import com.example.catapp.common.Constants
 import com.example.catapp.data.network.CatApiService
+import com.example.catapp.data.repository.CatBreedRepositoryImpl
+import com.example.catapp.data.repository.ICatBreedRepository
+import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
@@ -21,22 +23,30 @@ class AppModule {
 
     @Provides
     @Singleton
-    fun provideOkHttpClient(
-        @ApplicationContext context: Context
-    ): OkHttpClient {
+    fun provideOkHttpClient(): OkHttpClient {
         return OkHttpClient.Builder()
-            .addInterceptor(ChuckerInterceptor.Builder(context).build())
+            .addInterceptor { chain ->
+                val request = chain.request().newBuilder()
+                    .addHeader("x-api-key", BuildConfig.API_KEY)
+                    .build()
+                chain.proceed(request)
+            }
             .build()
     }
 
     @Provides
     @Singleton
-    fun provideApiService(okHttpClient: OkHttpClient): CatApiService {
-        val retrofit = Retrofit.Builder()
+    fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
+        return Retrofit.Builder()
             .baseUrl(Constants.BASE_URL)
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideApiService(retrofit: Retrofit): CatApiService {
         return retrofit.create(CatApiService::class.java)
     }
 }

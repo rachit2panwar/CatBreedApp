@@ -1,15 +1,16 @@
 package com.example.catapp.domain
 
 import com.example.catapp.data.models.CatBreedDataModel
-import com.example.catapp.data.network.CatApiService
+import com.example.catapp.data.repository.ICatBreedRepository
+import com.example.catapp.utils.Resource
 import javax.inject.Inject
 
 class CatBreedDataUseCase @Inject constructor(
-    private val client: CatApiService
+    private val repository: ICatBreedRepository
 ) {
 
-    suspend fun getCatBreedData(): List<CatBreedDataModel> {
-        return client.getCatBreed()
+    suspend fun getCatBreedData(): Resource<List<CatBreedDataModel>> {
+        return repository.getCatBreedData()
     }
 
 }

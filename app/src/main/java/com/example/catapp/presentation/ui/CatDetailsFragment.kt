@@ -16,6 +16,7 @@ import com.example.catapp.data.models.CatBreedDataModel
 import com.example.catapp.databinding.FragmentCatDetailsBinding
 import com.example.catapp.presentation.viewmodel.CatViewModel
 import com.example.catapp.utils.ImageUrlUtils
+import com.example.catapp.utils.Resource
 import dagger.hilt.android.AndroidEntryPoint
 
 
@@ -48,11 +49,17 @@ class CatDetailsFragment : Fragment() {
 
     private fun setupDataObserver() {
         viewModel.breedDetailsData.observe(viewLifecycleOwner) { breedItem ->
-            setupUI(breedItem)
-        }
-        viewModel.errorMessage.observe(viewLifecycleOwner) {
-            Toast.makeText(this@CatDetailsFragment.context, it, Toast.LENGTH_SHORT).show()
-            binding.pbLoader.visibility = View.GONE
+            when (breedItem) {
+                is Resource.Success -> {
+                    binding.pbLoader.visibility = View.GONE
+                    breedItem.data?.let { setupUI(it) } ?:  Toast.makeText(this@CatDetailsFragment.context, "Error", Toast.LENGTH_SHORT).show()
+                }
+                is Resource.Error ->{
+                    binding.pbLoader.visibility = View.GONE
+                    Toast.makeText(this@CatDetailsFragment.context, breedItem.message, Toast.LENGTH_SHORT).show()
+                }
+                is Resource.Loading -> binding.pbLoader.visibility = View.VISIBLE
+            }
         }
     }
 

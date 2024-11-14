@@ -14,6 +14,7 @@ import com.example.catapp.data.models.CatBreedDataModel
 import com.example.catapp.databinding.FragmentCatBreedBinding
 import com.example.catapp.presentation.adapter.CatAdapter
 import com.example.catapp.presentation.viewmodel.CatViewModel
+import com.example.catapp.utils.Resource
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -39,7 +40,7 @@ class CatBreedFragment : Fragment() {
         setupToolbar()
         setupViewModel()
         setupRecyclerView()
-        getCatBreedData()
+        viewModel.getCatBreedData()
     }
 
     private fun setupToolbar() {
@@ -50,20 +51,19 @@ class CatBreedFragment : Fragment() {
         }
     }
 
-    private fun getCatBreedData() {
-        if (viewModel.catBreedData.value.isNullOrEmpty()) {
-            viewModel.getCatBreedData()
-        }
-    }
-
     private fun setupViewModel() {
-        viewModel.catBreedData.observe(viewLifecycleOwner) {
-            submitList(it)
-            binding.pbLoader.visibility = View.GONE
-        }
-        viewModel.errorMessage.observe(viewLifecycleOwner) {
-            Toast.makeText(this@CatBreedFragment.context, it, Toast.LENGTH_SHORT).show()
-            binding.pbLoader.visibility = View.GONE
+        viewModel.catBreedData.observe(viewLifecycleOwner) { catData ->
+            when (catData) {
+                is Resource.Success -> {
+                    binding.pbLoader.visibility = View.GONE
+                    catData.data?.let { submitList(it) } ?:  Toast.makeText(this@CatBreedFragment.context, "Error", Toast.LENGTH_SHORT).show()
+                }
+                is Resource.Error ->{
+                    binding.pbLoader.visibility = View.GONE
+                    Toast.makeText(this@CatBreedFragment.context, catData.message, Toast.LENGTH_SHORT).show()
+                }
+                is Resource.Loading -> binding.pbLoader.visibility = View.VISIBLE
+            }
         }
     }
 

@@ -9,7 +9,9 @@ import com.example.catapp.data.models.CatBreedDataModel
 import com.example.catapp.data.network.CatApiService
 import com.example.catapp.domain.CatBreedDataUseCase
 import com.example.catapp.domain.CatDetailsUseCase
+import com.example.catapp.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -19,38 +21,27 @@ class CatViewModel @Inject constructor(
     private val catDetailsUseCase: CatDetailsUseCase
 ): ViewModel() {
 
-    private val _catBreedData = MutableLiveData<List<CatBreedDataModel>>()
-    val catBreedData : LiveData<List<CatBreedDataModel>> = _catBreedData
+    private val _catBreedData = MutableLiveData< Resource<List<CatBreedDataModel>>>()
+    val catBreedData : LiveData<Resource<List<CatBreedDataModel>>> = _catBreedData
 
-    private val _breedDetailsData = MutableLiveData<CatBreedDataModel>()
-    val breedDetailsData : LiveData<CatBreedDataModel> = _breedDetailsData
+    private val _breedDetailsData = MutableLiveData<Resource<CatBreedDataModel>>()
+    val breedDetailsData : LiveData<Resource<CatBreedDataModel>> = _breedDetailsData
 
     private val _sharedCatBreed = MutableLiveData<CatBreedDataModel>()
     val sharedCatBreed : LiveData<CatBreedDataModel> = _sharedCatBreed
 
-    private val _errorMessage = MutableLiveData<String>()
-    val errorMessage: LiveData<String> = _errorMessage
-
 
      fun getCatBreedData() {
-         viewModelScope.launch {
-             try {
-                 val response = catBreedDataUseCase.getCatBreedData()
-                 _catBreedData.postValue(response)
-             } catch (e: Exception) {
-                 _errorMessage.postValue(e.message)
-             }
+         viewModelScope.launch(Dispatchers.IO)  {
+             val response = catBreedDataUseCase.getCatBreedData()
+             _catBreedData.postValue(response)
          }
     }
 
      fun getBreedDetailsData(id: String) {
-         viewModelScope.launch {
-             try {
-                 val response = catDetailsUseCase.getBreedDetailsData(id)
-                 _breedDetailsData.postValue(response)
-             } catch (e: Exception) {
-                 _errorMessage.postValue(e.message)
-             }
+         viewModelScope.launch(Dispatchers.IO) {
+             val response = catDetailsUseCase.getBreedDetailsData(id)
+             _breedDetailsData.postValue(response)
          }
     }
 
